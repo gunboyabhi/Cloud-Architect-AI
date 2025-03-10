@@ -1,0 +1,8 @@
+fastapi[standard]
+requests
+python-dotenv
+groq
+python-hcl2
+diagrams
+graphviz
+boto3

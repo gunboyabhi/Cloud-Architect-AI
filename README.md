@@ -32,3 +32,5 @@ fastapi-app/
   1. Comprehensive Analysis
   2. Actionable Recommendations for Enhancement
 5. cost predictor
+6. DR strategy
+7. Infrastructure deployment

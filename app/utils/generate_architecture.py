@@ -26,14 +26,15 @@ from diagrams.aws.engagement import Connect, Pinpoint, SES
 from diagrams.aws.game import Gamelift
 
 # GCP
-from diagrams.gcp.compute import GCE, KubernetesEngine, Run, AppEngine, Functions
-from diagrams.gcp.database import SQL, Spanner, Bigtable, Firestore
+from diagrams.gcp.compute import GCE, GKE, KubernetesEngine, Run, AppEngine, Functions
+from diagrams.gcp.database import SQL, Spanner, Bigtable, Firestore, Memorystore
 from diagrams.gcp.ml import AIPlatform
 from diagrams.gcp.analytics import BigQuery, Dataflow, PubSub
 from diagrams.gcp.devtools import Build
 from diagrams.gcp.storage import GCS, Filestore
-from diagrams.gcp.network import LoadBalancing, VirtualPrivateCloud
+from diagrams.gcp.network import CDN, LoadBalancing, VirtualPrivateCloud
 from diagrams.gcp.security import Iam as GCP_IAM, SecurityCommandCenter
+from diagrams.gcp.operations import Monitoring, Logging
 
 # Azure
 from diagrams.azure.compute import VM, ContainerInstances, FunctionApps, AKS
@@ -134,10 +135,11 @@ SERVICE_MAP = {
     # "aws_appflow_flow": Appflow,
     "aws_mwaa_environment": AmazonManagedWorkflowsApacheAirflow,
     "aws_mq_broker": MQ,
-
     # "aws_athena_workgroup": Athena,
+
     # GCP Services
     "google_compute_instance": GCE,
+    "google_compute_instance_group_manager": GCE,
     "google_kubernetes_engine_cluster": KubernetesEngine,
     "google_cloud_run_service": Run,
     "google_app_engine_application": AppEngine,
@@ -155,6 +157,17 @@ SERVICE_MAP = {
     "google_filestore_instance": Filestore,
     "google_compute_network": VirtualPrivateCloud,
     "google_compute_firewall": SecurityCommandCenter,
+    "google_compute_forwarding_rule": LoadBalancing, 
+    "google_compute_backend_bucket": CDN,
+    "google_monitoring_alert_policy": Monitoring,
+    "google_logging_sink": Logging,
+    "google_monitoring_notification_channel": Monitoring,
+    "google_logging_project_sink": Logging,
+    "google_redis_instance": Memorystore,
+    "google_iam_policy": GCP_IAM,
+    "google_container_cluster": GKE,
+
+
     # Azure Services
     "azurerm_virtual_machine": VM,
     "azurerm_container_instance": ContainerInstances,
@@ -191,7 +204,7 @@ def generate_architecture_diagram(data, filename="AI_generated_cloud_architectur
       if not data:
         return
       local_filename = f"{filename}.svg"
-      with Diagram("AI_generated_cloud_architecture", outformat="svg", show=False, filename=filename):
+      with Diagram("AI Generated Cloud Architecture", outformat="svg", show=False, filename=filename):
           nodes = {}
           breakpoint()
           # Define cloud clusters
@@ -202,7 +215,12 @@ def generate_architecture_diagram(data, filename="AI_generated_cloud_architectur
           }
           # Create cloud clusters and nodes
           for node in data["nodes"]:
-              service_icon = SERVICE_MAP.get(node["type"], EC2)  # Default to EC2 if unknown
+              if node['cloud'] == 'AWS':
+                service_icon = SERVICE_MAP.get(node["type"], EC2)  # Default to EC2 if unknown
+              elif node['cloud'] == 'GCP':
+                service_icon = SERVICE_MAP.get(node["type"], GCE)  # Default to GCE if unknown
+              else:
+                 service_icon = SERVICE_MAP.get(node["type"], VM)  # Default to VM if unknown
               with cloud_clusters.get(node["cloud"], Diagram()):
                 nodes[node["id"]] = service_icon(node["id"])
 
@@ -216,7 +234,7 @@ def generate_architecture_diagram(data, filename="AI_generated_cloud_architectur
       s3_url = ''
 
       # Cleanup local file
-      os.remove(local_filename)
+      # os.remove(local_filename)
 
       return s3_url if s3_url else None
     except Exception as e:

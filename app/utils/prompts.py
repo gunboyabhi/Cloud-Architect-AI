@@ -22,6 +22,7 @@ Generate a JSON structure for a cloud architecture where:
     - Nodes (services)
     - Dependencies (which node connects to which)
     - The cloud provider for each node
+    - type should unique terraform resource type example, aws_instance, aws_s3_bucket
     - Ensure services follow the **Well-Architected Framework** principles, such as:
         - High availability
         - Fault tolerance
@@ -29,35 +30,61 @@ Generate a JSON structure for a cloud architecture where:
         - Scalability
     - Ensure the architecture includes appropriate nodes and dependencies, aligning with the Well-Architected Framework principles.
     - Maintain the correct sequence of services from an architectural perspective.
-    - The output must be a valid JSON object without any code blocks or formatting like "```json```"
-    - Return only the raw JSON response without any explanations.
+
+Additionally, provide a second list in the JSON that contains the corresponding **Terraform Infrastructure as Code (IaC)** for the architecture. The Terraform code should:
+    - Use the correct provider (`aws_`, `gcp_`, `azure_`) for each service.
+    - Define resources, variables, and dependencies appropriately.
+    - Follow Terraform best practices for modularity and reusability.
+
+The final JSON structure should have:
+1. **Nodes and dependencies** (as described above).
+2. **Terraform IaC list** where each entry maps to the nodes in the architecture.
+3. **Ensure the output is a valid JSON object without code blocks (e.g., ` ```json `).
+
+### **IMPORTANT INSTRUCTIONS**:
+- **Return ONLY raw JSON output.**  
+- **Do NOT include any explanations, descriptions, or introductory text.**  
+- **Ensure the output is a valid JSON object without code blocks (e.g., ` ```json `).**  
 
 Example format:
-Unique Terraform resource type: aws_<service_name>, gcp_<service_name>, azure_<service_name> should be used in following nodes type. for example, aws_instance, aws_lambda, aws_s3_bucket etc
 {
-  "nodes": [
+  "architecture": {
+    "nodes": [
+      {
+        "id": "Load Balancer",
+        "type": "aws_<service_name>",
+        "cloud": "AWS"
+      },
+      {
+        "id": "EC2 Instance 1",
+        "type": "aws_<service_name>",
+        "cloud": "AWS"
+      },
+      more nodes...
+    ],
+    "dependencies": [
+      {
+        "source": "Load Balancer",
+        "target": "EC2 Instance 1"
+      },
+      {
+        "source": "Load Balancer",
+        "target": "EC2 Instance 2"
+      },
+      more dependencies...
+    ]
+  },
+  "terraform": [
     {
-      "id": "Load Balancer",
-      "type": "aws_<service_name>",
-      "cloud": "AWS"
+      "resource": "aws_lb",
+      "config": "resource \"aws_lb\" \"example\" { ... }"
     },
     {
-      "id": "EC2 Instance 1",
-      "type": "aws_<service_name>",
-      "cloud": "AWS"
+      "resource": "aws_instance",
+      "config": "resource \"aws_instance\" \"example\" { ... }"
     },
-    more nodes...
-  ],
-  "dependencies": [
-    {
-      "source": "Load Balancer",
-      "target": "EC2 Instance 1"
-    },
-    {
-      "source": "Load Balancer",
-      "target": "EC2 Instance 2"
-    },
-    more dependencies...
+    more Terraform resources...
   ]
 }
 """
+

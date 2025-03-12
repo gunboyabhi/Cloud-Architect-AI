@@ -2,9 +2,9 @@ import os
 import requests
 from groq import Groq
 from dotenv import load_dotenv
-from prompts import node_connection_prompt
-from generate_architecture import generate_architecture_diagram
-import llm_models
+from .prompts import node_connection_prompt
+from .generate_architecture import generate_architecture_diagram
+from . import llm_models
 
 load_dotenv()
 
@@ -35,14 +35,16 @@ def get_response_from_llm(prompt, system_prompt=node_connection_prompt):
 
 
 
-CLOUD_SERVICE = "AWS"
-prompt = f"""
-can you help me in creation of architecture for deploying web application on ec2 instance 
+# CLOUD_SERVICE = "GCP"
+# prompt = f"""
+# can you help me in creation of architecture for deploying complex web application
 
-FOR CLOUD: {CLOUD_SERVICE}
-"""
-output = get_response_from_llm(prompt)
-import json
-json_output = json.loads(output) or ''
-ok = generate_architecture_diagram(json_output)
+# FOR CLOUD: {CLOUD_SERVICE}
+# """
+# output = get_response_from_llm(prompt)
+# import json
+# json_output = json.loads(output) or ''
+# arch = json_output.get("architecture")
+# breakpoint()
+# ok = generate_architecture_diagram(arch)
 
